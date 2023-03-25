@@ -2,28 +2,30 @@ class LocalAddUser {
   constructor(private readonly cacheStore: CacheStore) {}
 
   async save(): Promise<void> {
-    this.cacheStore.delete();
+    this.cacheStore.delete("email@email.com");
   }
 }
 
 interface CacheStore {
-  delete: () => void;
+  delete: (key: string) => void;
 }
 
 class CacheStoreSpy implements CacheStore {
   deleteCallsCount = 0;
+  key: string;
 
-  delete(): void {
+  delete(key: string): void {
     this.deleteCallsCount++;
+    this.key = key;
   }
 }
 
+// sut = system under test
 type SutTypes = {
   sut: LocalAddUser;
   cacheStore: CacheStoreSpy;
 };
 
-// sut = system under test
 const makeSut = (): SutTypes => {
   const cacheStore = new CacheStoreSpy();
   const sut = new LocalAddUser(cacheStore);
@@ -48,5 +50,14 @@ describe("LocalAddUser", () => {
     await sut.save();
 
     expect(cacheStore.deleteCallsCount).toBe(1);
+  });
+
+  test("should call delete with correct key", async () => {
+    const { cacheStore, sut } = makeSut();
+
+    const key = "email@email.com";
+    await sut.save();
+
+    expect(cacheStore.key).toBe(key);
   });
 });
