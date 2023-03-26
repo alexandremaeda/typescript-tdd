@@ -50,14 +50,6 @@ describe("LocalAddUser", () => {
     await sut.save();
 
     expect(cacheStore.deleteCallsCount).toBe(1);
-  });
-
-  test("should call delete with correct key", async () => {
-    const { cacheStore, sut } = makeSut();
-
-    const key = "email@email.com";
-    await sut.save();
-
-    expect(cacheStore.key).toBe(key);
+    expect(cacheStore.key).toBe("email@email.com");
   });
 });
